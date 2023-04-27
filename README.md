@@ -1,2 +1,3 @@
-# TextEditor
-hihihi
+# CIS594 Project TextEditor
+
+
