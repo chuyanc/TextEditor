@@ -1,18 +1,48 @@
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
+import java.util.Queue;
+
 
 class TextKeyListener implements KeyListener {
 
     private final JTextArea textArea;
     private final LinkedList<Character> textContent;
+    private final Queue<String> selectedTextQueue;
+    private final JPopupMenu popupMenu;
 
+//    public TextKeyListener(JTextArea textArea) {
+//        this.textArea = textArea;
+//        textContent = new LinkedList<>();
+//    }
     public TextKeyListener(JTextArea textArea) {
         this.textArea = textArea;
         textContent = new LinkedList<>();
+        selectedTextQueue = new LinkedList<>();
+        popupMenu = new JPopupMenu();
+        JMenuItem copyMenuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
+        JMenuItem pasteMenuItem = new JMenuItem(new DefaultEditorKit.PasteAction());
+        popupMenu.add(copyMenuItem);
+        popupMenu.add(pasteMenuItem);
+        textArea.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    String selectedText = textArea.getSelectedText();
+                    if (selectedText != null && !selectedText.isEmpty()) {
+                        selectedTextQueue.add(selectedText);
+                    }
+                    popupMenu.show(textArea, e.getX(), e.getY());
+                }
+            }
+        });
     }
+
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -61,6 +91,9 @@ class TextKeyListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+    }
+    public Queue<String> getSelectedTextQueue() {
+        return selectedTextQueue;
     }
 
 
