@@ -6,16 +6,15 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 class TextKeyListener implements KeyListener {
 
     private final JTextArea textArea;
-    private Stack<String> undoStack;
-    private Stack<String> redoStack;
+    private Stack<Map.Entry<String, Integer>> undoStack;
+    private Stack<Map.Entry<String, Integer>> redoStack;
+    private int lastKeyCode;
+    private boolean lastUndo = false;
 
 
     private final LinkedList<Character> textContent;
@@ -37,8 +36,14 @@ class TextKeyListener implements KeyListener {
         }
         int caretPosition = textArea.getCaretPosition();
         if (caretPosition >= 0) {
+            if (lastUndo){
+                redoStack.clear();
+                lastUndo = false;
+            }
+            lastKeyCode = keyChar;
             textContent.add(caretPosition, keyChar);
-            undoStack.push(Character.toString(keyChar));
+            Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<>(Character.toString(keyChar), textArea.getCaretPosition());
+            undoStack.push(entry);
             System.out.println("1:"+undoStack.peek());
             updateTextArea();
             textArea.setCaretPosition(caretPosition + 1);
@@ -57,23 +62,10 @@ class TextKeyListener implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-//        if (keyCode == KeyEvent.VK_TAB) {
-//            int caretPosition = textArea.getCaretPosition();
-//            if (caretPosition > 0) {
-//                try {
-//                    textArea.getDocument().remove(caretPosition - 1, 1);
-//                } catch (BadLocationException ex) {
-//                    throw new RuntimeException(ex);
-//                }
-//                textArea.setCaretPosition(caretPosition - 1);
-//                e.consume();
-//            }
-//        } else
-        if (keyCode == KeyEvent.VK_CONTROL){
+        if (keyCode == KeyEvent.VK_BACK_SPACE){
+            lastKeyCode = KeyEvent.VK_BACK_SPACE;
             int caretPosition = textArea.getCaretPosition();
             if (caretPosition > 0) {
-                char current = textContent.get(caretPosition-1);
-                undoStack.push(Character.toString(current));
                 textContent.remove(caretPosition-1);
                 updateTextArea();
                 textArea.setCaretPosition(caretPosition - 1);
@@ -82,7 +74,6 @@ class TextKeyListener implements KeyListener {
         }
         if (keyCode == KeyEvent.VK_Z && e.isControlDown()){
             undo();
-
         }
         if (keyCode == KeyEvent.VK_Y && e.isControlDown()){
             redo();
@@ -96,25 +87,46 @@ class TextKeyListener implements KeyListener {
 
     public void undo() {
         if (!undoStack.isEmpty()) {
-            String prevText = undoStack.pop();
-            redoStack.push(prevText);
-            int size = textContent.size();
-            for (int i = textContent.size()-1; i > size - prevText.length() - 1; i--){
-                textContent.remove(i);
-                updateTextArea();
+            Map.Entry<String, Integer> entry = undoStack.pop();
+            String prevText = entry.getKey();
+            int pos = entry.getValue();
+            redoStack.push(entry);
+            if (!Character.isISOControl(lastKeyCode)){
+                deleteText(prevText.length(), pos+1);
+                lastUndo = true;
             }
+
         }
     }
 
     public void redo() {
         if (!redoStack.isEmpty()) {
-            String nextText = redoStack.pop();
-            undoStack.push(nextText);
-            for (char c : nextText.toCharArray()){
-                textContent.add(c);
+            Map.Entry<String, Integer> entry = redoStack.pop();
+            String nextText = entry.getKey();
+            int pos = entry.getValue();
+            undoStack.push(new AbstractMap.SimpleEntry<>(nextText, pos));
+            if (!Character.isISOControl(lastKeyCode)){
+                insertText(nextText, pos);
             }
-            updateTextArea();
         }
+    }
+
+
+    public void deleteText(int textSize, int pos){
+        if (pos <= 0) return;
+        for (int i = pos-1; i > pos-textSize-1; i--){
+            textContent.remove(i);
+        }
+        updateTextArea();
+        textArea.setCaretPosition(pos-1);
+    }
+
+    public void insertText(String toBeInserted, int pos){
+        for (int i = 0; i < toBeInserted.length(); i++){
+            textContent.add(pos+i, toBeInserted.charAt(i));
+        }
+        updateTextArea();
+        textArea.setCaretPosition(pos+1);
     }
 
 
