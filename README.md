@@ -1,7 +1,7 @@
 # TextEditor
 CIT TextEditor is a basic text editor built with Java Swing.
 
-Features:
+## Features:
 
 1. Ability to open and save text files.
 2. Text manipulation functions such as copy, cut, clear, and paste.
@@ -11,7 +11,7 @@ Features:
 
 
 
-Functions:
+## Functions:
 
 1. Open and save text files using the "Open" and "Save" icons. Change font size and style with corresponding icons.
 2. Copy, paste, and cut text using the "Ctrl + C", "Ctrl + V", and "Ctrl + Z" shortcuts or their respective icons.
@@ -20,12 +20,12 @@ Functions:
 
 To run the text editor, simply compile and run the SimpleJavaTextEditor.java file in your Java IDE.
 
-Contributing
+## Contributing
 
 If you would like to contribute to this project, feel free to submit a pull request.
 
-License
+## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MCIT License. See the LICENSE file for details.
 
 
