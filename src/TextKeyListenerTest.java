@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
@@ -35,13 +37,35 @@ public class TextKeyListenerTest {
         textKeyListener.keyTyped(new KeyEvent(textArea, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, 'b'));
         textKeyListener.keyTyped(new KeyEvent(textArea, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, 'c'));
         textArea.setCaretPosition(2);
-        KeyEvent backspaceEvent = new KeyEvent(textArea, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_CONTROL, KeyEvent.CHAR_UNDEFINED);
+        KeyEvent backspaceEvent = new KeyEvent(textArea, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_BACK_SPACE, KeyEvent.CHAR_UNDEFINED);
         textKeyListener.keyPressed(backspaceEvent);
         assertEquals("ac", textArea.getText());
         textArea.setCaretPosition(1);
-        KeyEvent backspaceEvent2 = new KeyEvent(textArea, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_CONTROL, KeyEvent.CHAR_UNDEFINED);
-        textKeyListener.keyPressed(backspaceEvent2);
+        textKeyListener.keyPressed(backspaceEvent);
         assertEquals("c", textArea.getText());
+    }
+
+    @Test
+    public void testUndoRedo() {
+        textKeyListener.keyTyped(new KeyEvent(textArea, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, 'a'));
+        textKeyListener.keyTyped(new KeyEvent(textArea, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, 'b'));
+        textKeyListener.keyTyped(new KeyEvent(textArea, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, 'c'));
+        textKeyListener.keyTyped(new KeyEvent(textArea, KeyEvent.KEY_TYPED, System.currentTimeMillis(), 0, KeyEvent.VK_UNDEFINED, 'd'));
+        KeyEvent undoEvent = new KeyEvent(textArea, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), InputEvent.CTRL_DOWN_MASK, KeyEvent.VK_Z, KeyEvent.CHAR_UNDEFINED);
+        textKeyListener.keyPressed(undoEvent);
+        textArea.setCaretPosition(1);
+        textKeyListener.keyPressed(undoEvent);
+        assertEquals("ab", textArea.getText());
+        KeyEvent redoEvent = new KeyEvent(textArea, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), InputEvent.CTRL_DOWN_MASK, KeyEvent.VK_Y, KeyEvent.CHAR_UNDEFINED);
+        textArea.setCaretPosition(0);
+        textKeyListener.keyPressed(redoEvent);
+        textKeyListener.keyPressed(redoEvent);
+        assertEquals("abcd", textArea.getText());
+        textKeyListener.keyPressed(undoEvent);
+        textKeyListener.keyPressed(undoEvent);
+        textKeyListener.keyPressed(undoEvent);
+        assertEquals("a", textArea.getText());
+
     }
 
 

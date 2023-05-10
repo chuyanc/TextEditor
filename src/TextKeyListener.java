@@ -44,7 +44,6 @@ class TextKeyListener implements KeyListener {
             textContent.add(caretPosition, keyChar);
             Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<>(Character.toString(keyChar), textArea.getCaretPosition());
             undoStack.push(entry);
-            System.out.println("1:"+undoStack.peek());
             updateTextArea();
             textArea.setCaretPosition(caretPosition + 1);
             e.consume();
