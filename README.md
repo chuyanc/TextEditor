@@ -7,8 +7,8 @@ Features:
 1. Ability to open and save text files.
 2. Text manipulation functions such as copy, cut, clear, and paste.
 3. Option to adjust font size and style.
-4. Getting started guide.
-5. Ability to suggests k words based on their weight when the user types in text.
+4. Ability to suggests k words based on their weight when the user types in text.
+5. Getting started the new file.
 
 
 
