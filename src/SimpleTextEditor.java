@@ -18,5 +18,7 @@ public class SimpleTextEditor extends JTextPane {
         }
 
         new TextEditor().createTextEditor();
+        // new TextEditor().setVisible(true);
+
     }
 }
