@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.*;
+import java.util.List;
 
 class TextKeyListener implements KeyListener {
 
@@ -19,15 +20,32 @@ class TextKeyListener implements KeyListener {
 
     private final LinkedList<Character> textContent;
 
+    // Display top k results
+    private int k;//
+
+    private List<ITerm> matches;//
+    private IAutocomplete auto;//
+
 
     public TextKeyListener(JTextArea textArea) {
         this.textArea = textArea;
         textContent = new LinkedList<>();
         this.undoStack = new Stack<>();
         this.redoStack = new Stack<>();
+        this.k = 3;//
+        auto = new Autocomplete();//
+        auto.buildTrie("C:\\Users\\84715\\Desktop\\TextEditor\\src\\wiktionary.txt", k);//
     }
 
 
+
+    private int getWordStart(String text, int caretPosition) {//
+        int wordStart = caretPosition - 1;
+        while (wordStart >= 0 && Character.isLetter(text.charAt(wordStart))) {
+            wordStart--;
+        }
+        return wordStart + 1;
+    }
     @Override
     public void keyTyped(KeyEvent e) {
         char keyChar = e.getKeyChar();
@@ -76,6 +94,24 @@ class TextKeyListener implements KeyListener {
         }
         if (keyCode == KeyEvent.VK_Y && e.isControlDown()){
             redo();
+        }
+        if (keyCode == KeyEvent.VK_CONTROL) {//
+            e.consume(); // Prevents the focus from being transferred to another component
+            int caretPosition = textArea.getCaretPosition();
+            String text = textArea.getText();
+            int wordStart = getWordStart(text, caretPosition);
+            if (wordStart < caretPosition) {
+                String word = text.substring(wordStart, caretPosition);
+                matches = auto.getSuggestions(word);
+                if (!matches.isEmpty()) {
+                    String suggestedWord = matches.get(0).getTerm();
+                    System.out.println(suggestedWord);
+                    for (char each : suggestedWord.toCharArray()) {
+                        textContent.add(each);
+                    }
+                }
+            }
+            updateTextArea();
         }
     }
 
