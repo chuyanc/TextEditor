@@ -17,7 +17,7 @@ CIT TextEditor is a basic text editor built with Java Swing.
 2. Copy, paste, and cut text using the "Ctrl + C", "Ctrl + V", and "Ctrl + Z" shortcuts or their respective icons.
 3. Create a new file and start working right away.
 
-
+## DEMO
 To run the text editor, simply compile and run the SimpleJavaTextEditor.java file in your Java IDE.
 
 ## Contributing
