@@ -1,5 +1,4 @@
 # CIS594 Project TextEditor
-# CIS594 Project TextEditor
 CIT TextEditor is a basic text editor built with Java Swing.
 
 Features:
